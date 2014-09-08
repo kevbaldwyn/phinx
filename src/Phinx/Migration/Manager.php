@@ -136,7 +136,7 @@ class Manager
      * @param int $version
      * @return void
      */
-    public function migrate($environment, $version = null)
+    public function migrate($environment, $version = null, $type = MigrationInterface::TYPE_ALL)
     {
         $migrations = $this->getMigrations();
         $env = $this->getEnvironment($environment);
@@ -171,7 +171,7 @@ class Manager
                 }
 
                 if (in_array($migration->getVersion(), $versions)) {
-                    $this->executeMigration($environment, $migration, MigrationInterface::DOWN);
+                    $this->executeMigration($environment, $migration, MigrationInterface::DOWN, $type);
                 }
             }
         }
@@ -183,7 +183,7 @@ class Manager
             }
 
             if (!in_array($migration->getVersion(), $versions)) {
-                $this->executeMigration($environment, $migration, MigrationInterface::UP);
+                $this->executeMigration($environment, $migration, MigrationInterface::UP, $type);
             }
         }
     }
@@ -196,7 +196,7 @@ class Manager
      * @param string $direction Direction
      * @return void
      */
-    public function executeMigration($name, MigrationInterface $migration, $direction = MigrationInterface::UP)
+    public function executeMigration($name, MigrationInterface $migration, $direction = MigrationInterface::UP, $type = MigrationInterface::TYPE_ALL)
     {
         $this->getOutput()->writeln('');
         $this->getOutput()->writeln(
@@ -207,7 +207,7 @@ class Manager
 
         // Execute the migration and log the time elapsed.
         $start = microtime(true);
-        $this->getEnvironment($name)->executeMigration($migration, $direction);
+        $this->getEnvironment($name)->executeMigration($migration, $direction, $type);
         $end = microtime(true);
         
         $this->getOutput()->writeln(
@@ -269,7 +269,7 @@ class Manager
             }
 
             if (in_array($migration->getVersion(), $versions)) {
-                $this->executeMigration($environment, $migration, MigrationInterface::DOWN);
+                $this->executeMigration($environment, $migration, MigrationInterface::DOWN, MigrationInterface::TYPE_ALL);
             }
         }
     }

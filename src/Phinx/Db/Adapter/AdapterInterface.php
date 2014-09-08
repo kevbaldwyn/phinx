@@ -85,11 +85,12 @@ interface AdapterInterface
      *
      * @param MigrationInterface $migration Migration
      * @param string $direction Direction
+     * @param string $type Type of migration
      * @param int $startTime Start Time
      * @param int $endTime End Time
      * @return AdapterInterface
      */
-    public function migrated(MigrationInterface $migration, $direction, $startTime, $endTime);
+    public function migrated(MigrationInterface $migration, $direction, $type, $startTime, $endTime);
 
     /**
      * Does the schema table exist?

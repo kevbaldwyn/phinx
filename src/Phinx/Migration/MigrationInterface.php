@@ -53,6 +53,13 @@ interface MigrationInterface
      */
     const DOWN = 'down';
     
+
+    const TYPE_ALL = 'all';
+
+    const TYPE_CONSTRUCTIVE = 'constructive';
+
+    const TYPE_DESTRUCTIVE = 'destructive';
+
     /**
      * Migrate Up
      *
@@ -60,12 +67,20 @@ interface MigrationInterface
      */
     public function up();
 
+    public function constructiveUp();
+
+    public function destructiveUp();
+
     /**
      * Migrate Down
      *
      * @return void
      */
     public function down();
+
+    public function constructiveDown();
+
+    public function destructiveDown();
     
     /**
      * Sets the database adapter.

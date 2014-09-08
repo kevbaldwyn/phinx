@@ -4,6 +4,7 @@ namespace Test\Phinx\Migration\Manager;
 
 use Phinx\Db\Adapter\MysqlAdapter;
 use Phinx\Migration\Manager\Environment;
+use Phinx\Migration\MigrationInterface;
 
 class EnvironmentTest extends \PHPUnit_Framework_TestCase
 {
@@ -257,5 +258,18 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
         $env->registerAdapter($adapterName, $adapter);
         $env->setOptions(array('adapter' => $adapterName));
         $env->getAdapter();
+    }
+
+
+    public function testDetermineMigrationMethod()
+    {
+        $env = new Environment('testenv', array());
+        
+        $this->assertSame('up', $env->determineMethod(MigrationInterface::UP, MigrationInterface::TYPE_ALL));
+        $this->assertSame('down', $env->determineMethod(MigrationInterface::DOWN, MigrationInterface::TYPE_ALL));
+        $this->assertSame('constructiveUp', $env->determineMethod(MigrationInterface::UP, MigrationInterface::TYPE_CONSTRUCTIVE));
+        $this->assertSame('constructiveDown', $env->determineMethod(MigrationInterface::DOWN, MigrationInterface::TYPE_CONSTRUCTIVE));
+        $this->assertSame('destructiveUp', $env->determineMethod(MigrationInterface::UP, MigrationInterface::TYPE_DESTRUCTIVE));
+        $this->assertSame('destructiveDown', $env->determineMethod(MigrationInterface::DOWN, MigrationInterface::TYPE_DESTRUCTIVE));
     }
 }

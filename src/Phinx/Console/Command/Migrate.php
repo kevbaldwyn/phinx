@@ -31,6 +31,7 @@ namespace Phinx\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
+use Phinx\Migration\MigrationInterface;
 
 class Migrate extends AbstractCommand
 {
@@ -85,10 +86,16 @@ EOT
 
         // run the migrations
         $start = microtime(true);
-        $this->getManager()->migrate($environment, $version);
+        $this->doMigration($environment, $version);
         $end = microtime(true);
         
         $output->writeln('');
         $output->writeln('<comment>All Done. Took ' . sprintf('%.4fs', $end - $start) . '</comment>');
+    }
+
+
+    protected function doMigration($environment, $version)
+    {
+        $this->getManager()->migrate($environment, $version, MigrationInterface::TYPE_ALL);
     }
 }

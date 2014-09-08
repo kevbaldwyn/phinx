@@ -319,20 +319,22 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function migrated(MigrationInterface $migration, $direction, $startTime, $endTime)
+    public function migrated(MigrationInterface $migration, $direction, $type, $startTime, $endTime)
     {
         if (strcasecmp($direction, MigrationInterface::UP) === 0) {
             // up
             $sql = sprintf(
                 'INSERT INTO %s ('
-                . 'version, start_time, end_time'
+                . 'version, type, start_time, end_time'
                 . ') VALUES ('
+                . '"%s",'
                 . '"%s",'
                 . '"%s",'
                 . '"%s"'
                 . ');',
                 $this->getSchemaTableName(),
                 $migration->getVersion(),
+                $type,
                 $startTime,
                 $endTime
             );
@@ -372,6 +374,7 @@ abstract class PdoAdapter implements AdapterInterface
             
             $table = new Table($this->getSchemaTableName(), $options, $this);
             $table->addColumn('version', 'biginteger', array('limit' => 14))
+                  ->addColumn('type', 'string', array('limit' => 20))
                   ->addColumn('start_time', 'timestamp')
                   ->addColumn('end_time', 'timestamp')
                   ->save();

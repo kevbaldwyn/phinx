@@ -115,10 +115,11 @@ class Environment
      * @param string $direction Direction
      * @return void
      */
-    public function executeMigration(MigrationInterface $migration, $direction = MigrationInterface::UP)
+    public function executeMigration(MigrationInterface $migration, $direction = MigrationInterface::UP, $type = MigrationInterface::TYPE_ALL)
     {
         $startTime = time();
         $direction = ($direction == MigrationInterface::UP) ? MigrationInterface::UP : MigrationInterface::DOWN;
+        $method    = $this->determineMethod($direction, $type);
         $migration->setAdapter($this->getAdapter());
         
         // begin the transaction if the adapter supports it
@@ -146,7 +147,7 @@ class Environment
                 $migration->change();
             }
         } else {
-            $migration->{$direction}();
+            $migration->{$method}();
         }
         
         // commit the transaction if the adapter supports it
@@ -155,8 +156,19 @@ class Environment
         }
 
         // Record it in the database
-        $this->getAdapter()->migrated($migration, $direction, date('Y-m-d H:i:s', $startTime), date('Y-m-d H:i:s', time()));
+        $this->getAdapter()->migrated($migration, $direction, $type, date('Y-m-d H:i:s', $startTime), date('Y-m-d H:i:s', time()));
     }
+
+
+    public function determineMethod($direction, $type)
+    {
+        if($type == MigrationInterface::TYPE_ALL) {
+            return $direction;
+        }else{
+            return $type . ucwords($direction);
+        }
+    }
+
     
     /**
      * Sets the environment's name.
