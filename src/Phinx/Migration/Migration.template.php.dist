@@ -20,16 +20,27 @@ class $className extends AbstractMigration
     /**
      * Migrate Up.
      */
-    public function up()
+
+    public function constructiveUp()
     {
-    
+
+    }
+
+    public function destructiveUp()
+    {
+
     }
 
     /**
      * Migrate Down.
      */
-    public function down()
+    public function constructiveDown()
     {
 
+    }
+
+    public function destructiveDown()
+    {
+        
     }
 }

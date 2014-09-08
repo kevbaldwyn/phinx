@@ -78,6 +78,18 @@ abstract class AbstractMigration implements MigrationInterface
      */
     public function up()
     {
+        $this->constructiveUp();
+        $this->destructiveUp();
+    }
+
+    public function constructiveUp()
+    {
+
+    }
+
+    public function destructiveUp()
+    {
+
     }
     
     /**
@@ -85,6 +97,18 @@ abstract class AbstractMigration implements MigrationInterface
      */
     public function down()
     {
+        $this->constructiveDown();
+        $this->destructiveDown();
+    }
+
+    public function constructiveDown()
+    {
+
+    }
+
+    public function destructiveDown()
+    {
+
     }
     
     /**
