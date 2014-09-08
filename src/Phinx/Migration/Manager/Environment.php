@@ -241,9 +241,9 @@ class Environment
      *
      * @return array
      */
-    public function getVersions()
+    public function getVersions($type = MigrationInterface::TYPE_ALL)
     {
-        return $this->getAdapter()->getVersions();
+        return $this->getAdapter()->getVersions($type);
     }
     
     /**

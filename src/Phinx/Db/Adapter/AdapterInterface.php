@@ -63,7 +63,7 @@ interface AdapterInterface
      *
      * @return array
      */
-    public function getVersions();
+    public function getVersions($type);
 
     /**
      * Sets the console output.

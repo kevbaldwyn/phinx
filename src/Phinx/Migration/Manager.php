@@ -140,7 +140,7 @@ class Manager
     {
         $migrations = $this->getMigrations();
         $env = $this->getEnvironment($environment);
-        $versions = $env->getVersions();
+        $versions = $env->getVersions($type);
         $current = $env->getCurrentVersion();
         
         if (empty($versions) && empty($migrations)) {
