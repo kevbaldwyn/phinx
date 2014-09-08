@@ -136,12 +136,12 @@ class Manager
      * @param int $version
      * @return void
      */
-    public function migrate($environment, $version = null, $type = MigrationInterface::TYPE_ALL)
+    public function migrate($environment, $version = null, $type)
     {
         $migrations = $this->getMigrations();
         $env = $this->getEnvironment($environment);
         $versions = $env->getVersions($type);
-        $current = $env->getCurrentVersion();
+        $current = $env->getCurrentVersion($type);
         
         if (empty($versions) && empty($migrations)) {
             return;
@@ -171,7 +171,7 @@ class Manager
                 }
 
                 if (in_array($migration->getVersion(), $versions)) {
-                    $this->executeMigration($environment, $migration, MigrationInterface::DOWN, $type);
+                    $this->executeMigration($environment, $migration, $type, MigrationInterface::DOWN);
                 }
             }
         }
@@ -183,7 +183,7 @@ class Manager
             }
 
             if (!in_array($migration->getVersion(), $versions)) {
-                $this->executeMigration($environment, $migration, MigrationInterface::UP, $type);
+                $this->executeMigration($environment, $migration, $type, MigrationInterface::UP, $type);
             }
         }
     }
@@ -196,7 +196,7 @@ class Manager
      * @param string $direction Direction
      * @return void
      */
-    public function executeMigration($name, MigrationInterface $migration, $direction = MigrationInterface::UP, $type = MigrationInterface::TYPE_ALL)
+    public function executeMigration($name, MigrationInterface $migration, $type, $direction = MigrationInterface::UP)
     {
         $this->getOutput()->writeln('');
         $this->getOutput()->writeln(
@@ -207,7 +207,7 @@ class Manager
 
         // Execute the migration and log the time elapsed.
         $start = microtime(true);
-        $this->getEnvironment($name)->executeMigration($migration, $direction, $type);
+        $this->getEnvironment($name)->executeMigration($migration, $type, $direction);
         $end = microtime(true);
         
         $this->getOutput()->writeln(
@@ -269,7 +269,8 @@ class Manager
             }
 
             if (in_array($migration->getVersion(), $versions)) {
-                $this->executeMigration($environment, $migration, MigrationInterface::DOWN, MigrationInterface::TYPE_ALL);
+                $this->executeMigration($environment, $migration, MigrationInterface::TYPE_DESTRUCTIVE, MigrationInterface::DOWN);
+                $this->executeMigration($environment, $migration, MigrationInterface::TYPE_CONSTRUCTIVE, MigrationInterface::DOWN);
             }
         }
     }

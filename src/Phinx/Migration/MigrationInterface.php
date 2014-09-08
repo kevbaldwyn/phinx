@@ -54,7 +54,7 @@ interface MigrationInterface
     const DOWN = 'down';
     
 
-    const TYPE_ALL = 'all';
+    //const TYPE_ALL = 'all';
 
     const TYPE_CONSTRUCTIVE = 'constructive';
 

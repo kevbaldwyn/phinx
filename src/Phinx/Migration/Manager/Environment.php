@@ -115,7 +115,7 @@ class Environment
      * @param string $direction Direction
      * @return void
      */
-    public function executeMigration(MigrationInterface $migration, $direction = MigrationInterface::UP, $type = MigrationInterface::TYPE_ALL)
+    public function executeMigration(MigrationInterface $migration, $type, $direction = MigrationInterface::UP)
     {
         $startTime = time();
         $direction = ($direction == MigrationInterface::UP) ? MigrationInterface::UP : MigrationInterface::DOWN;
@@ -162,11 +162,7 @@ class Environment
 
     public function determineMethod($direction, $type)
     {
-        if($type == MigrationInterface::TYPE_ALL) {
-            return $direction;
-        }else{
-            return $type . ucwords($direction);
-        }
+        return $type . ucwords($direction);
     }
 
     
@@ -241,7 +237,7 @@ class Environment
      *
      * @return array
      */
-    public function getVersions($type = MigrationInterface::TYPE_ALL)
+    public function getVersions($type)
     {
         return $this->getAdapter()->getVersions($type);
     }
@@ -263,12 +259,12 @@ class Environment
      *
      * @return int
      */
-    public function getCurrentVersion()
+    public function getCurrentVersion($type)
     {
         // We don't cache this code as the current version is pretty volatile.
         // TODO - that means they're no point in a setter then?
         // maybe we should cache and call a reset() method everytime a migration is run
-        $versions = $this->getVersions();
+        $versions = $this->getVersions($type);
         $version = 0;
             
         if (!empty($versions)) {

@@ -96,6 +96,7 @@ EOT
 
     protected function doMigration($environment, $version)
     {
-        $this->getManager()->migrate($environment, $version, MigrationInterface::TYPE_ALL);
+        $this->getManager()->migrate($environment, $version, MigrationInterface::TYPE_CONSTRUCTIVE);
+        $this->getManager()->migrate($environment, $version, MigrationInterface::TYPE_DESTRUCTIVE);
     }
 }

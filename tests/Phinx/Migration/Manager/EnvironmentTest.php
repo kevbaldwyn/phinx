@@ -265,8 +265,8 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
     {
         $env = new Environment('testenv', array());
         
-        $this->assertSame('up', $env->determineMethod(MigrationInterface::UP, MigrationInterface::TYPE_ALL));
-        $this->assertSame('down', $env->determineMethod(MigrationInterface::DOWN, MigrationInterface::TYPE_ALL));
+        //$this->assertSame('up', $env->determineMethod(MigrationInterface::UP, MigrationInterface::TYPE_ALL));
+        //$this->assertSame('down', $env->determineMethod(MigrationInterface::DOWN, MigrationInterface::TYPE_ALL));
         $this->assertSame('constructiveUp', $env->determineMethod(MigrationInterface::UP, MigrationInterface::TYPE_CONSTRUCTIVE));
         $this->assertSame('constructiveDown', $env->determineMethod(MigrationInterface::DOWN, MigrationInterface::TYPE_CONSTRUCTIVE));
         $this->assertSame('destructiveUp', $env->determineMethod(MigrationInterface::UP, MigrationInterface::TYPE_DESTRUCTIVE));
