@@ -343,9 +343,10 @@ abstract class PdoAdapter implements AdapterInterface
         } else {
             // down
             $sql = sprintf(
-                "DELETE FROM %s WHERE version = '%s'",
+                "DELETE FROM %s WHERE version = '%s' AND type = '%s'",
                 $this->getSchemaTableName(),
-                $migration->getVersion()
+                $migration->getVersion(),
+                $type
             );
             
             $this->query($sql);

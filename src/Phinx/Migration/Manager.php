@@ -225,11 +225,11 @@ class Manager
      * @param int $version
      * @return void
      */
-    public function rollback($environment, $version = null)
+    public function rollback($environment, $version = null, $type)
     {
         $migrations = $this->getMigrations();
         $env = $this->getEnvironment($environment);
-        $versions = $env->getVersions();
+        $versions = $env->getVersions($type);
 
         ksort($migrations);
         sort($versions);
@@ -269,8 +269,7 @@ class Manager
             }
 
             if (in_array($migration->getVersion(), $versions)) {
-                $this->executeMigration($environment, $migration, MigrationInterface::TYPE_DESTRUCTIVE, MigrationInterface::DOWN);
-                $this->executeMigration($environment, $migration, MigrationInterface::TYPE_CONSTRUCTIVE, MigrationInterface::DOWN);
+                $this->executeMigration($environment, $migration, $type, MigrationInterface::DOWN);
             }
         }
     }
