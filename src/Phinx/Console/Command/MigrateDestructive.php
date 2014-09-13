@@ -15,15 +15,15 @@ class MigrateDestructive extends Migrate
     {
         parent::configure();
 
-        $this->setName('migrate-destructive')
+        $this->setName('migrate:destructive')
              ->setDescription('Migrate only the database destructively')
              ->setHelp(
 <<<EOT
-The <info>migrate-destructive</info> command runs all available destructive migrations, optionally up to a specific version
+The <info>migrate:destructive</info> command runs all available destructive migrations, optionally up to a specific version
 
-<info>phinx migrate-destructive -e development</info>
-<info>phinx migrate-destructive -e development -t 20110103081132</info>
-<info>phinx migrate-destructive -e development -v</info>
+<info>phinx migrate:destructive -e development</info>
+<info>phinx migrate:destructive -e development -t 20110103081132</info>
+<info>phinx migrate:destructive -e development -v</info>
 
 EOT
              );

@@ -44,16 +44,16 @@ class Migrate extends AbstractCommand
 
         $this->addOption('--environment', '-e', InputArgument::OPTIONAL, 'The target environment');
 
-        $this->setName('migrate')
+        $this->setName('migrate:latest')
              ->setDescription('Migrate the database')
              ->addOption('--target', '-t', InputArgument::OPTIONAL, 'The version number to migrate to')
              ->setHelp(
 <<<EOT
 The <info>migrate</info> command runs all available migrations, optionally up to a specific version
 
-<info>phinx migrate -e development</info>
-<info>phinx migrate -e development -t 20110103081132</info>
-<info>phinx migrate -e development -v</info>
+<info>phinx migrate:latest -e development</info>
+<info>phinx migrate:latest -e development -t 20110103081132</info>
+<info>phinx migrate:latest -e development -v</info>
 
 EOT
              );

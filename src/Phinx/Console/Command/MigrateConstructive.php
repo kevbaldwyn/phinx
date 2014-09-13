@@ -15,15 +15,15 @@ class MigrateConstructive extends Migrate
     {
         parent::configure();
 
-        $this->setName('migrate-constructive')
+        $this->setName('migrate:constructive')
              ->setDescription('Migrate only the database constructively')
              ->setHelp(
 <<<EOT
-The <info>migrate-constructive</info> command runs all available constructive migrations, optionally up to a specific version
+The <info>migrate:constructive</info> command runs all available constructive migrations, optionally up to a specific version
 
-<info>phinx migrate-constructive -e development</info>
-<info>phinx migrate-constructive -e development -t 20110103081132</info>
-<info>phinx migrate-constructive -e development -v</info>
+<info>phinx migrate:constructive -e development</info>
+<info>phinx migrate:constructive -e development -t 20110103081132</info>
+<info>phinx migrate:constructive -e development -v</info>
 
 EOT
              );
