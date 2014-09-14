@@ -79,28 +79,45 @@ class Manager
         $migrations = array();
         if (count($this->getMigrations())) {
             $output->writeln('');
-            $output->writeln(' Status  Migration ID    Migration Name ');
-            $output->writeln('-----------------------------------------');
+            $output->writeln(' Status  Constructive  Destructive  Migration ID    Migration Name ');
+            $output->writeln('-------------------------------------------------------------------');
         
             $env = $this->getEnvironment($environment);
-            $versions = $env->getVersions();
+            $versionsConstructive = $env->getVersions(MigrationInterface::TYPE_CONSTRUCTIVE);
+            $versionsDestructive  = $env->getVersions(MigrationInterface::TYPE_DESTRUCTIVE);
 
             foreach ($this->getMigrations() as $migration) {
-                if (in_array($migration->getVersion(), $versions)) {
-                    $status = '     <info>up</info> ';
-                    unset($versions[array_search($migration->getVersion(), $versions)]);
+                // check each version type...
+                // create extra column for type
+                if (in_array($migration->getVersion(), $versionsConstructive) || in_array($migration->getVersion(), $versionsDestructive)) {
+                    $status = ' <info>up</info>      ';
+                    if(in_array($migration->getVersion(), $versionsConstructive)) {
+                        $constructive = '<info>yes</info>           ';
+                        unset($versionsConstructive[array_search($migration->getVersion(), $versionsConstructive)]);
+                    }else{
+                        $constructive = '<info>no</info>            ';
+                    }
+                    if(in_array($migration->getVersion(), $versionsDestructive)) {
+                        $destructive = '<info>yes</info>         ';
+                        unset($versionsDestructive[array_search($migration->getVersion(), $versionsDestructive)]);
+                    }else{
+                        $destructive = '<info>no</info>          ';
+                    }
                 } else {
-                    $status = '   <error>down</error> ';
+                    $status = ' <error>down</error>      ';
                 }
             
                 $output->writeln(
                     $status
+                    . $constructive
+                    . $destructive
                     . sprintf(' %14.0f ', $migration->getVersion())
                     . ' <comment>' . $migration->getName() . '</comment>'
                 );
                 $migrations[] = array('migration_status' => trim(strip_tags($status)), 'migration_id' => sprintf('%14.0f', $migration->getVersion()), 'migration_name' => $migration->getName());
             }
-        
+            
+            /*
             foreach ($versions as $missing) {
                 $output->writeln(
                     '     <error>up</error> '
@@ -108,6 +125,7 @@ class Manager
                     . ' <error>** MISSING **</error>'
                 );
             }
+            */
         } else {
             // there are no migrations
             $output->writeln('');
