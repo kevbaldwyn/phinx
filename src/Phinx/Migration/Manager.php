@@ -95,16 +95,16 @@ class Manager
                         $constructive = '<info>yes</info>           ';
                         unset($versionsConstructive[array_search($migration->getVersion(), $versionsConstructive)]);
                     }else{
-                        $constructive = '<info>no</info>            ';
+                        $constructive = '<error>no</error>            ';
                     }
                     if(in_array($migration->getVersion(), $versionsDestructive)) {
                         $destructive = '<info>yes</info>         ';
                         unset($versionsDestructive[array_search($migration->getVersion(), $versionsDestructive)]);
                     }else{
-                        $destructive = '<info>no</info>          ';
+                        $destructive = '<error>no</error>          ';
                     }
                 } else {
-                    $status = ' <error>down</error>      ';
+                    $status = ' <error>down</error>    ';
                 }
             
                 $output->writeln(
@@ -117,6 +117,8 @@ class Manager
                 $migrations[] = array('migration_status' => trim(strip_tags($status)), 'migration_id' => sprintf('%14.0f', $migration->getVersion()), 'migration_name' => $migration->getName());
             }
             
+            // $versionsDestructive
+            // $versionsConstructive
             /*
             foreach ($versions as $missing) {
                 $output->writeln(
@@ -126,6 +128,7 @@ class Manager
                 );
             }
             */
+
         } else {
             // there are no migrations
             $output->writeln('');
