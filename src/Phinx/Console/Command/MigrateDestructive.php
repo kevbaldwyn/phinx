@@ -17,6 +17,7 @@ class MigrateDestructive extends Migrate
 
         $this->setName('migrate:destructive')
              ->setDescription('Migrate only the database destructively')
+             ->addOption('--target', '-t', InputArgument::OPTIONAL, 'The version number to migrate to')
              ->setHelp(
 <<<EOT
 The <info>migrate:destructive</info> command runs all available destructive migrations, optionally up to a specific version

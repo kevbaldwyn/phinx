@@ -207,7 +207,21 @@ class Manager
                 $this->executeMigration($environment, $migration, $type, MigrationInterface::UP, $type);
             }
         }
+
+        // write lock file
+        $this->writeLockFile($environment);
     }
+
+    private function writeLockFile($environment)
+    {
+        $env = $this->getEnvironment($environment);
+        $versionsConstructive = $env->getVersions(MigrationInterface::TYPE_CONSTRUCTIVE);
+        $versionsDestructive  = $env->getVersions(MigrationInterface::TYPE_DESTRUCTIVE);
+
+        // reverse versions and get first (which will be the latest)
+        rsort();
+    }
+
     
     /**
      * Execute a migration against the specified Environment.

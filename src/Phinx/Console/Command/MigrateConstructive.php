@@ -17,6 +17,7 @@ class MigrateConstructive extends Migrate
 
         $this->setName('migrate:constructive')
              ->setDescription('Migrate only the database constructively')
+             ->addOption('--target', '-t', InputArgument::OPTIONAL, 'The version number to migrate to')
              ->setHelp(
 <<<EOT
 The <info>migrate:constructive</info> command runs all available constructive migrations, optionally up to a specific version
