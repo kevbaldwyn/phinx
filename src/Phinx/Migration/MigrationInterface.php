@@ -3,7 +3,7 @@
  * Phinx
  *
  * (The MIT license)
- * Copyright (c) 2014 Rob Morgan
+ * Copyright (c) 2015 Rob Morgan
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated * documentation files (the "Software"), to
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- * 
+ *
  * @package    Phinx
  * @subpackage Phinx\Migration
  */
@@ -30,6 +30,8 @@ namespace Phinx\Migration;
 
 use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Db\Table;
+use Symfony\Component\Console\Output\OutputInterface;
+
 
 /**
  * Migration interface
@@ -42,12 +44,12 @@ interface MigrationInterface
      * @var string
      */
     const CHANGE = 'change';
-    
+
     /**
      * @var string
      */
     const UP = 'up';
-    
+
     /**
      * @var string
      */
@@ -59,6 +61,7 @@ interface MigrationInterface
     const TYPE_CONSTRUCTIVE = 'constructive';
 
     const TYPE_DESTRUCTIVE = 'destructive';
+
 
     /**
      * Migrate Up
@@ -82,6 +85,7 @@ interface MigrationInterface
 
     public function destructiveDown();
     
+
     /**
      * Sets the database adapter.
      *
@@ -89,21 +93,36 @@ interface MigrationInterface
      * @return MigrationInterface
      */
     public function setAdapter(AdapterInterface $adapter);
-    
+
     /**
      * Gets the database adapter.
      *
      * @return AdapterInterface
      */
     public function getAdapter();
-    
+
+    /**
+     * Sets the output object to be used in migration object
+     *
+     * @param OutputInterface $output
+     * @return MigrationInterface
+     */
+    public function setOutput(OutputInterface $output);
+
+    /**
+     * Gets the output object to be used in migration object
+     *
+     * @return OutputInterface
+     */
+    public function getOutput();
+
     /**
      * Gets the name.
      *
      * @return string
      */
     public function getName();
-    
+
     /**
      * Sets the migration version number.
      *
@@ -111,30 +130,30 @@ interface MigrationInterface
      * @return MigrationInterface
      */
     public function setVersion($version);
-    
+
     /**
      * Gets the migration version number.
      *
      * @return float
      */
     public function getVersion();
-    
+
     /**
      * Executes a SQL statement and returns the number of affected rows.
-     * 
+     *
      * @param string $sql SQL
      * @return int
      */
     public function execute($sql);
-    
+
     /**
-     * Executes a SQL statement and returns the result as an array. 
+     * Executes a SQL statement and returns the result as an array.
      *
      * @param string $sql SQL
      * @return array
      */
     public function query($sql);
-    
+
     /**
      * Executes a query and returns only one row as an array.
      *
@@ -142,7 +161,7 @@ interface MigrationInterface
      * @return array
      */
     public function fetchRow($sql);
-    
+
     /**
      * Executes a query and returns an array of rows.
      *
@@ -150,7 +169,7 @@ interface MigrationInterface
      * @return array
      */
     public function fetchAll($sql);
-    
+
     /**
      * Create a new database.
      *
@@ -159,7 +178,7 @@ interface MigrationInterface
      * @return void
      */
     public function createDatabase($name, $options);
-    
+
     /**
      * Drop a database.
      *
@@ -167,7 +186,7 @@ interface MigrationInterface
      * @return void
      */
     public function dropDatabase($name);
-    
+
     /**
      * Checks to see if a table exists.
      *
@@ -175,7 +194,7 @@ interface MigrationInterface
      * @return boolean
      */
     public function hasTable($tableName);
-    
+
     /**
      * Returns an instance of the <code>\Table</code> class.
      *

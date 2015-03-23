@@ -3,7 +3,7 @@
  * Phinx
  *
  * (The MIT license)
- * Copyright (c) 2014 Rob Morgan
+ * Copyright (c) 2015 Rob Morgan
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated * documentation files (the "Software"), to
@@ -22,20 +22,16 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- * 
+ *
  * @package    Phinx
  * @subpackage Phinx\Migration\Manager
  */
 namespace Phinx\Migration\Manager;
 
-use Phinx\Db\Adapter\SqlServerAdapter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Phinx\Db\Adapter\AdapterFactory;
 use Phinx\Db\Adapter\AdapterInterface;
-use Phinx\Db\Adapter\MysqlAdapter;
-use Phinx\Db\Adapter\PostgresAdapter;
-use Phinx\Db\Adapter\SQLiteAdapter;
-use Phinx\Db\Adapter\ProxyAdapter;
 use Phinx\Migration\MigrationInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Environment
 {
@@ -43,7 +39,7 @@ class Environment
      * @var string
      */
     protected $name;
-    
+
     /**
      * @var array
      */
@@ -53,21 +49,16 @@ class Environment
      * @var OutputInterface
      */
     protected $output;
-    
+
     /**
      * @var int
      */
     protected $currentVersion;
-    
+
     /**
      * @var string
      */
     protected $schemaTableName = 'phinxlog';
-
-    /**
-     * @var callable[] AdapterInterface factory closures
-     */
-    protected $adapterFactories = array();
 
     /**
      * @var AdapterInterface
@@ -85,27 +76,6 @@ class Environment
     {
         $this->name = $name;
         $this->options = $options;
-
-        foreach (static::defaultAdapterFactories() as $adapterName => $adapterFactoryClosure) {
-            $this->registerAdapter($adapterName, $adapterFactoryClosure);
-        }
-    }
-
-    /**
-     * You can register new adapter types, by passing a closure which
-     * instantiates and returns an implementation of `AdapterInterface`.
-     *
-     * @param string    $adapterName
-     * @param callable  $adapterFactoryClosure A closure which accepts an Environment parameter and returns an AdapterInterface implementation
-     */
-    public function registerAdapter($adapterName, $adapterFactoryClosure)
-    {
-        // TODO When 5.3 support is dropped, the `callable` type hint should be
-        // added to the $adapterFactoryClosure paramter, and this test can be removed.
-        if (!is_callable($adapterFactoryClosure)) {
-            throw new \RuntimeException('Provided adapter factory must be callable and return an object implementing AdapterInterface.');
-        }
-        $this->adapterFactories[$adapterName] = $adapterFactoryClosure;
     }
 
     /**
@@ -121,22 +91,19 @@ class Environment
         $direction = ($direction == MigrationInterface::UP) ? MigrationInterface::UP : MigrationInterface::DOWN;
         $method    = $this->determineMethod($direction, $type);
         $migration->setAdapter($this->getAdapter());
-        
+
         // begin the transaction if the adapter supports it
         if ($this->getAdapter()->hasTransactions()) {
             $this->getAdapter()->beginTransaction();
         }
-        
-        // force UTF-8 encoding for MySQL
-        // TODO - this code will need to be abstracted when we support other db vendors
-        //$this->getAdapter()->execute('SET NAMES UTF8');
-        
+
         // Run the migration
         if (method_exists($migration, MigrationInterface::CHANGE)) {
             if ($direction == MigrationInterface::DOWN) {
                 // Create an instance of the ProxyAdapter so we can record all
                 // of the migration commands for reverse playback
-                $proxyAdapter = new ProxyAdapter($this->getAdapter(), $this->getOutput());
+                $proxyAdapter = AdapterFactory::instance()
+                    ->getWrapper('proxy', $this->getAdapter());
                 $migration->setAdapter($proxyAdapter);
                 /** @noinspection PhpUndefinedMethodInspection */
                 $migration->change();
@@ -149,7 +116,7 @@ class Environment
         } else {
             $migration->{$method}();
         }
-        
+
         // commit the transaction if the adapter supports it
         if ($this->getAdapter()->hasTransactions()) {
             $this->getAdapter()->commitTransaction();
@@ -177,7 +144,7 @@ class Environment
         $this->name = $name;
         return $this;
     }
-    
+
     /**
      * Gets the environment name.
      *
@@ -187,7 +154,7 @@ class Environment
     {
         return $this->name;
     }
-    
+
     /**
      * Sets the environment's options.
      *
@@ -199,7 +166,7 @@ class Environment
         $this->options = $options;
         return $this;
     }
-    
+
     /**
      * Gets the environment's options.
      *
@@ -221,7 +188,7 @@ class Environment
         $this->output = $output;
         return $this;
     }
-    
+
     /**
      * Gets the console output.
      *
@@ -241,7 +208,7 @@ class Environment
     {
         return $this->getAdapter()->getVersions($type);
     }
-    
+
     /**
      * Sets the current version of the environment.
      *
@@ -253,7 +220,7 @@ class Environment
         $this->currentVersion = $version;
         return $this;
     }
-    
+
     /**
      * Gets the current version of the environment.
      *
@@ -266,15 +233,15 @@ class Environment
         // maybe we should cache and call a reset() method everytime a migration is run
         $versions = $this->getVersions($type);
         $version = 0;
-            
+
         if (!empty($versions)) {
             $version = end($versions);
         }
-            
+
         $this->setCurrentVersion($version);
         return $this->currentVersion;
     }
-    
+
     /**
      * Sets the database adapter.
      *
@@ -286,7 +253,7 @@ class Environment
         $this->adapter = $adapter;
         return $this;
     }
-    
+
     /**
      * Gets the database adapter.
      *
@@ -297,22 +264,35 @@ class Environment
         if (isset($this->adapter)) {
             return $this->adapter;
         }
+        if (isset($this->options['connection'])) {
+            if (!($this->options['connection'] instanceof \PDO)) {
+                throw new \RuntimeException('Given connection is not a PDO instance');
+            }
+
+            $this->options['adapter'] = $this->options['connection']->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        }
         if (!isset($this->options['adapter'])) {
             throw new \RuntimeException('No adapter was specified for environment: ' . $this->getName());
         }
-        if (!isset($this->adapterFactories[$this->options['adapter']])) {
-            throw new \RuntimeException('Invalid adapter specified: ' . $this->options['adapter']);
+
+        $adapter = AdapterFactory::instance()
+            ->getAdapter($this->options['adapter'], $this->options);
+
+        if ($this->getOutput()) {
+            $adapter->setOutput($this->getOutput());
         }
 
-        // Get the adapter factory, get the adapter, check the type, and return
-        $adapterFactory = $this->adapterFactories[$this->options['adapter']];
-        $adapter = $adapterFactory($this);
-        if (!$adapter instanceof AdapterInterface) {
-            throw new \RuntimeException('Adapter factory closure did not return an instance of \\Phinx\\Db\\Adapter\\AdapterInterface');
+        // Use the TablePrefixAdapter if table prefix/suffixes are in use
+        if ($adapter->hasOption('table_prefix') || $adapter->hasOption('table_suffix')) {
+            $adapter = AdapterFactory::instance()
+                ->getWrapper('prefix', $adapter);
         }
-        return $this->adapter = $adapter;
+
+        $this->setAdapter($adapter);
+
+        return $adapter;
     }
-    
+
     /**
      * Sets the schema table name.
      *
@@ -324,7 +304,7 @@ class Environment
         $this->schemaTableName = $schemaTableName;
         return $this;
     }
-    
+
     /**
      * Gets the schema table name.
      *
@@ -333,26 +313,5 @@ class Environment
     public function getSchemaTableName()
     {
         return $this->schemaTableName;
-    }
-
-    /**
-     * @return callable[] Array of factory closures for Phinx's default adapter implementations.
-     */
-    public static final function defaultAdapterFactories()
-    {
-        return array(
-            'mysql'     => function(Environment $env) {
-                return new MysqlAdapter($env->getOptions(), $env->getOutput());
-            },
-            'pgsql'     => function(Environment $env) {
-                return new PostgresAdapter($env->getOptions(), $env->getOutput());
-            },
-            'sqlite'    => function(Environment $env) {
-                return new SQLiteAdapter($env->getOptions(), $env->getOutput());
-            },
-            'sqlsrv'    => function(Environment $env) {
-                return new SqlServerAdapter($env->getOptions(), $env->getOutput());
-            },
-        );
     }
 }
