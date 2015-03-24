@@ -31,6 +31,7 @@ namespace Phinx\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Phinx\Migration\MigrationInterface;
 
 class Migrate extends AbstractCommand
 {
