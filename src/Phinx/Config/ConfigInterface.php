@@ -36,6 +36,9 @@ namespace Phinx\Config;
  */
 interface ConfigInterface extends \ArrayAccess
 {
+
+    const FILENAME_LOCK = 'phinx.lock';
+
     /**
      * Class Constructor
      *

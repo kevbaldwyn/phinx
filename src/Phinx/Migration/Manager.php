@@ -31,6 +31,7 @@ namespace Phinx\Migration;
 use Symfony\Component\Console\Output\OutputInterface;
 use Phinx\Config\ConfigInterface;
 use Phinx\Migration\Manager\Environment;
+use Illuminate\Filesystem\Filesystem;
 
 class Manager
 {
@@ -54,14 +55,22 @@ class Manager
      */
     protected $migrations;
 
+    protected $filesystem;
+
     /**
      * Class Constructor.
      *
      * @param ConfigInterface $config Configuration Object
      * @param OutputInterface $output Console Output
      */
-    public function __construct(ConfigInterface $config, OutputInterface $output)
+    public function __construct(ConfigInterface $config, OutputInterface $output, Filesystem $filesystem = null)
     {
+        if(is_null($filesystem)) {
+            $filesystem = new Filesystem();
+        }
+
+        $this->filesystem = $filesystem;
+
         $this->setConfig($config);
         $this->setOutput($output);
     }
@@ -215,12 +224,33 @@ class Manager
 
     private function writeLockFile($environment)
     {
+        $this->getOutput()->writeln('');
+        $this->getOutput()->writeln('<info>Writing lock file...</info>');
+
         $env = $this->getEnvironment($environment);
         $versionsConstructive = $env->getVersions(MigrationInterface::TYPE_CONSTRUCTIVE);
         $versionsDestructive  = $env->getVersions(MigrationInterface::TYPE_DESTRUCTIVE);
 
         // reverse versions and get first (which will be the latest)
-        rsort();
+        rsort($versionsConstructive);
+        rsort($versionsDestructive);
+
+        $lock = [
+            'constructive' => [
+                'version' => ((isset($versionsConstructive[0])) ? $versionsConstructive[0] : null)
+            ],
+            'destructive'  => [
+                'version' => ((isset($versionsDestructive[0])) ? $versionsDestructive[0] : null)
+            ],
+            'timestamp' => time(),
+            'generated_on_environment' => $environment
+        ];
+
+        $this->filesystem->put(
+            dirname($this->getConfig()->getConfigFilePath()) . '/' . ConfigInterface::FILENAME_LOCK,
+            json_encode($lock, JSON_PRETTY_PRINT)
+        );
+
     }
 
 
