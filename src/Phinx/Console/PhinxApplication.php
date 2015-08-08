@@ -57,6 +57,7 @@ class PhinxApplication extends Application
             new Command\Migrate(),
             new Command\MigrateConstructive(),
             new Command\MigrateDestructive(),
+            new Command\MigrateLocked(),
             new Command\Rollback(),
             new Command\Status(),
             new Command\Test(),
