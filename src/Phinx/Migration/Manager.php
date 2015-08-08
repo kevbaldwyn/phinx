@@ -166,7 +166,7 @@ class Manager
      * @param int $version
      * @return void
      */
-    public function migrate($environment, $version = null, $type)
+    public function migrate($environment, $version = null, $type, $writeLockFile = true)
     {
         $migrations = $this->getMigrations();
         $env = $this->getEnvironment($environment);
@@ -218,7 +218,9 @@ class Manager
         }
 
         // write lock file
-        $this->writeLockFile($environment);
+        if($writeLockFile) {
+            $this->writeLockFile($environment);
+        }
     }
 
 

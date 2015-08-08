@@ -64,8 +64,8 @@ EOT
         $lock = $this->getLock();
 
         // migrate
-        $this->getManager()->migrate($environment, $lock['constructive'], MigrationInterface::TYPE_CONSTRUCTIVE);
-        $this->getManager()->migrate($environment, $lock['destructive'], MigrationInterface::TYPE_DESTRUCTIVE);
+        $this->getManager()->migrate($environment, $lock['constructive'], MigrationInterface::TYPE_CONSTRUCTIVE, false);
+        $this->getManager()->migrate($environment, $lock['destructive'], MigrationInterface::TYPE_DESTRUCTIVE, false);
 	}
 
 }
