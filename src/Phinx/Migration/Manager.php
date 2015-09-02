@@ -244,7 +244,7 @@ class Manager
             'destructive'  => [
                 'version' => ((isset($versionsDestructive[0])) ? $versionsDestructive[0] : null)
             ],
-            'timestamp' => time(),
+            'time' => date('Y-m-d H:i:s', time()),
             'generated_on_environment' => $environment
         ];
 
