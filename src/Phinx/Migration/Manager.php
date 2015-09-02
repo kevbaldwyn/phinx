@@ -293,7 +293,7 @@ class Manager
      * @param int $version
      * @return void
      */
-    public function rollback($environment, $version = null, $type)
+    public function rollback($environment, $version = null, $type, $writeLockFile = true)
     {
         $migrations = $this->getMigrations();
         $env = $this->getEnvironment($environment);
@@ -339,6 +339,11 @@ class Manager
             if (in_array($migration->getVersion(), $versions)) {
                 $this->executeMigration($environment, $migration, $type, MigrationInterface::DOWN);
             }
+        }
+
+        // write lock file
+        if($writeLockFile) {
+            $this->writeLockFile($environment);
         }
     }
 

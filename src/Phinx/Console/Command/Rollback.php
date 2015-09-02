@@ -101,7 +101,7 @@ EOT
 
     protected function doRollback($environment, $version)
     {
-        $this->getManager()->rollback($environment, $version, MigrationInterface::TYPE_CONSTRUCTIVE);
+        $this->getManager()->rollback($environment, $version, MigrationInterface::TYPE_CONSTRUCTIVE, false);
         $this->getManager()->rollback($environment, $version, MigrationInterface::TYPE_DESTRUCTIVE);
     }
 }
