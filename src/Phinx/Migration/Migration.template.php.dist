@@ -5,18 +5,12 @@ use $useClassName;
 class $className extends $baseClassName
 {
     /**
-     * Change Method.
-     *
-     * More information on this method is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-change-method
-     *
-     * Uncomment this method if you would like to use it.
-     *
-    public function change()
-    {
-    }
-    */
-    
+     * Note:
+     * Migrations are split into constructive and destructive. They can be ran separately or all at once.
+     * The idea is in a multi server environment 2 database states can be supported by different code bases
+     * and when deployed iteratively one code base may need the old schema until the deployment is complete.
+     */
+
     /**
      * Migrate Up.
      */
